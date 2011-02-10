@@ -8,7 +8,7 @@ Since it is possible to compile Faust code for several kinds of systems or stand
 Compilation
 -----------
 
-To compile this plugins you have to have SuperCollider and Faust installed. You will also need the faust2sc programm. If your distribution does not provide this programm, install it looking at the /tools folder in the Faust source code.
+To compile this plugins you have to have SuperCollider and Faust installed. You will also need the faust2sc program. If your distribution does not provide this program, install it looking at the /tools folder in the Faust source code.
 
 Edit the build.sh script and make sure `SC_SOURCE_DIR=` is set to your SuperCollider-Source/common folder. Also check if `FAUST2SC=` is correctly set.
 
@@ -19,7 +19,7 @@ If everything is right, you can install like this:
     ./build.sh
 
 
-The generated files will be placed in the GXPlugins folder.
+The generated files will be placed in the STKPlugins folder.
 
 
 Packagers
@@ -63,4 +63,4 @@ STK-FAUST CONTACTS
 
     rmichon@ccrma.stanford.edu
 
-Romain MICHON 
+    Romain MICHON 
