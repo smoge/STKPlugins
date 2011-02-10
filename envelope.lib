@@ -1,0 +1,69 @@
+declare name "Faust Envelope Library";
+declare author "Romain Michon";
+declare copyright "Romain Michon";
+declare version "1.0";
+declare reference "Mon_Site";
+
+import("math.lib");
+
+//*********************************************************************************
+// Vibrato Envelope
+//*********************************************************************************
+
+// Vibrato envelope with 4 phases : 
+//		- beginning : hold 0 for b seconds
+//		- attack : a in seconds
+//		- sustain : s is a percentage of the amplitude to be modified
+//		- release : r in seconds
+//USAGE : sig * env_vibr(b,a,s,r,t) ; t is the trigger signal
+
+env_vibr(b,a,s,r,t) = env ~ (_,_,_) : (!,!,_) // the 3 'state' signals are fed back
+with {
+    env (p2,cnt,y) =
+        (t>0) & (p2|(y>=1)), // p2 = decay-sustain phase
+		(cnt + 1)*(t>0), // counter for the first step "b" 
+        (y + p1*p3*u*(s/100) - p4*w*y)*((p4==0)|(y>=eps))	// y  = envelop signal
+		//*(y>=eps) // cut off tails to prevent denormals
+    with {
+	p1 = (p2==0) & (t>0) & (y<1) & (cnt>(b*SR)); // p1 = attack phase
+	p3 = 1-(cnt<(nb)); // p3 = beginning phase
+	p4 = (t<=0) & (y>0);  // p4 = release phase
+	// #samples in attack, decay, release, must be >0
+	nb = SR*b+(b==0.0) ; na = SR*a+(a==0.0); nr = SR*r+(r==0.0);
+	// attack and (-60dB) release rates
+	z = s+(s==0.0)*db2linear(-60);
+	u = 1/na; w = 1-1/pow(z*db2linear(60), 1/nr);
+	// values below this threshold are considered zero in the release phase
+	eps = db2linear(-120);
+    };
+};
+
+//*********************************************************************************
+// Attack - Sustain - Release envelope
+//*********************************************************************************
+
+// Envelope with 3 phases :
+//		- attack : a in seconds
+//		- sustain : s is a percentage of the amplitude to be modified
+//		- release : r in seconds
+//USAGE : sig * asr(a,s,r,t) ; t is the trigger signal
+
+asr(a,s,r,t) = env ~ (_,_) : (!,_) // the 2 'state' signals are fed back
+with {
+    env (p2,y) =
+        (t>0) & (p2|(y>=1)), // p2 = decay-sustain phase
+        (y + p1*u*(s/100) - p3*w*y)	// y  = envelop signal
+	*((p3==0)|(y>=eps)) // cut off tails to prevent denormals
+    with {
+	p1 = (p2==0) & (t>0) & (y<1); // p1 = attack phase
+	p3 = (t<=0) & (y>0); // p3 = release phase
+	// #samples in attack, decay, release, must be >0
+	na = SR*a+(a==0.0); nr = SR*r+(r==0.0);
+	// correct zero sustain level
+	z = s+(s==0.0)*db2linear(-60);
+	// attack, decay and (-60dB) release rates
+	u = 1/na; w = 1-1/pow(z*db2linear(60), 1/nr);
+	// values below this threshold are considered zero in the release phase
+	eps = db2linear(-120);
+    };
+};

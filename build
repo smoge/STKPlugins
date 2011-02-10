@@ -1,0 +1,17 @@
+#!/bin/bash
+
+rm -rf {stk_sc,STKPlugins}
+mkdir -p {STKPlugins,stk_sc,pkgdir}
+
+ls *.dsp | ./scbuilder \
+    FAUST2SC=/usr/bin/faust2sc \
+    FAUST2SC_PREFIX="STK" \
+    BUILD_SC=yes \
+    BUILD_XML=no \
+    DESTDIR=./pkgdir \
+    BUILD_DIR=./gx_sc \
+    INSTALL_DIR=./gx \
+    SC_SOURCE_DIR=/home/smoge/src/sc34/SuperCollider-Source/common \
+    BUILD_DIR=./STKPlugins
+
+
